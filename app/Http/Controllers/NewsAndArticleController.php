@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\NewsAndArticle;
 use App\Http\Requests\StoreNewsAndArticleRequest;
 use App\Http\Requests\UpdateNewsAndArticleRequest;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
 class NewsAndArticleController extends Controller
@@ -15,6 +16,12 @@ class NewsAndArticleController extends Controller
     public function index()
     {
 
+        //$previousDay = Carbon::now()->subDay();
+
+
+
+        $newsAndArticle = NewsAndArticle::limit(30)->latest()->get();
+        return $newsAndArticle;
     }
 
     /**
@@ -22,7 +29,11 @@ class NewsAndArticleController extends Controller
      */
     public function create()
     {
-        //
+        $endpoint = "https://newsapi.org/v2/everything?q=Apple&from=2023-09-11&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
+        $response = Http::get($endpoint);
+        $json =  json_decode($response, true);
+
+        return $json;
     }
 
     /**
@@ -30,7 +41,7 @@ class NewsAndArticleController extends Controller
      */
     public function store(StoreNewsAndArticleRequest $request)
     {
-        $endpoint = "https://newsapi.org/v2/everything?q=Apple&from=2023-09-11&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
+        $endpoint = "https://newsapi.org/v2/everything?q=Apple&from=2023-09-10&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
         $response = Http::get($endpoint);
         $json =  json_decode($response, true);
 
@@ -60,9 +71,10 @@ class NewsAndArticleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(NewsAndArticle $newsAndArticle)
+    public function show($id)
     {
-        //
+        $newsAndArticle = NewsAndArticle::findOrFail($id);
+        return $newsAndArticle;
     }
 
     /**

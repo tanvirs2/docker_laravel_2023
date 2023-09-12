@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\NewsAndArticleController;
+namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +19,10 @@ Route::get('/', function () {
 });
 
 Route::resource('scrapping', NewsAndArticleController::class)
-    ->middleware('guest');
+    //->middleware(['auth:sanctum'])
+;
+
+Route::resource('personalize-profile', PersonalizeProfileController::class);
+
 
 require __DIR__.'/auth.php';
