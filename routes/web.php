@@ -31,6 +31,7 @@ Route::resource('scrapping', NewsAndArticleController::class)
 
 Route::resource('personalize-profile', PersonalizeProfileController::class);
 Route::resource('news-source', NewsSourceController::class);
+Route::resource('news-author', NewsAuthorController::class);
 
 
 require __DIR__.'/auth.php';

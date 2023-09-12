@@ -26,7 +26,11 @@ Route::middleware(['auth:sanctum'])->get('/user-preference', function (Request $
     //return PersonalizeProfile::where('user_id', Auth::id())->first(); sources
     $personalizeProfile = $request->user()->personalizeProfile;
     if ($personalizeProfile) {
-        return [$personalizeProfile, json_decode($personalizeProfile->sources)];
+        return [
+            $personalizeProfile,
+            json_decode($personalizeProfile->sources),
+            json_decode($personalizeProfile->authors),
+        ];
     }
 
     return null;

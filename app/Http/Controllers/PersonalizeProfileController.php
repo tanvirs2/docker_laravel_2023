@@ -31,6 +31,7 @@ class PersonalizeProfileController extends Controller
     {
         $user_id = $request->user_id;
         $selectedSourceArr = [];
+        $selectedAuthorArr = [];
 
         $personalizeProfile = new PersonalizeProfile();
 
@@ -39,29 +40,48 @@ class PersonalizeProfileController extends Controller
 
         if ($hasPersonalizeProfile != null) {
             //update Personalize Profile data
-            //array_merge($arr)
+
+            /*sources*/
             $selectedSourceArr = json_decode($hasPersonalizeProfile->sources);
             if ($request->selectedSource) {
                 $selectedSourceArr[] = $request->selectedSource;
             }
             $hasPersonalizeProfile->sources = json_encode($selectedSourceArr);
+
+            /*authors*/
+            $selectedAuthorArr = json_decode($hasPersonalizeProfile->authors);
+            if ($request->selectedAuthor) {
+                $selectedAuthorArr[] = $request->selectedAuthor;
+            }
+            $hasPersonalizeProfile->authors = json_encode($selectedAuthorArr);
+
             $hasPersonalizeProfile->status = $request->status;
             $hasPersonalizeProfile->save();
         } else {
             // Personalize Profile not found and new entry
-
             $personalizeProfile->user_id = $user_id;
             if ($request->selectedSource) {
                 $selectedSourceArr[] = $request->selectedSource;
             }
             $personalizeProfile->sources = json_encode($selectedSourceArr);
+
+            /*authors*/
+            if ($request->selectedAuthor) {
+                $selectedAuthorArr[] = $request->selectedAuthor;
+            }
+            $personalizeProfile->authors = json_encode($selectedAuthorArr);
+
             $personalizeProfile->status = $request->status;
             $personalizeProfile->save();
 
             $hasPersonalizeProfile = $personalizeProfile;
         }
 
-        return [$hasPersonalizeProfile, json_decode($hasPersonalizeProfile->sources)];
+        return [
+            $hasPersonalizeProfile,
+            json_decode($hasPersonalizeProfile->sources),
+            json_decode($hasPersonalizeProfile->authors)
+        ];
     }
 
     /**

@@ -5,12 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\NewsAndArticle;
 use App\Http\Requests\StoreNewsAndArticleRequest;
 use App\Http\Requests\UpdateNewsAndArticleRequest;
+use App\Models\NewsAuthor;
 use App\Models\NewsSource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
 class NewsAndArticleController extends Controller
 {
+    function removeSpecialChar($str) {
+
+        // Using str_replace() function
+        // to replace the word
+        $res = str_replace( array( '\'', '"',
+            ',' , ';', '<', '>' ), ' ', $str);
+
+        // Returning the result
+        return $res;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -34,6 +45,7 @@ class NewsAndArticleController extends Controller
 
 
         $sourceArr = NewsSource::pluck('source_name')->toArray();
+        $authorArr = NewsAuthor::pluck('author_name')->toArray();
 
         foreach ($json['articles'] as $item) {
             $newsAndArticle = new NewsAndArticle();
@@ -46,7 +58,8 @@ class NewsAndArticleController extends Controller
             $newsAndArticle->source                 = $item['source']['name'];
             $newsAndArticle->publish_date           = $item['publishedAt'];
 
-            $sourceArr[] = $item['source']['name'];
+            $sourceArr[] = $this->removeSpecialChar($item['source']['name']);
+            $authorArr[] = $this->removeSpecialChar($item['author']);
 
             //echo $item['title'] . '<br>';
             //$newsAndArticle->save();
@@ -60,7 +73,17 @@ class NewsAndArticleController extends Controller
             $newsSource->save();
         }
 
-        return $sourceArr;
+        $authorArr = array_unique($authorArr);
+
+        //return ($authorArr);
+
+        foreach ($authorArr as $author) {
+            $newsAuthor = new NewsAuthor();
+            $newsAuthor->author_name = $author;
+            $newsAuthor->save();
+        }
+
+        return [$sourceArr, $authorArr];
     }
 
     /**
