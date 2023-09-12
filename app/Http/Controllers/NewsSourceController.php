@@ -13,7 +13,7 @@ class NewsSourceController extends Controller
      */
     public function index()
     {
-        //
+        return $all = NewsSource::pluck('source_name');
     }
 
     /**

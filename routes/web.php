@@ -15,6 +15,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    /*$selectedSourceArr = [];
+    $selectedSourceArr[] = 'tanvir';
+    $selectedSourceArr[] = 'nasir';
+
+    dump(json_decode(json_encode($selectedSourceArr)));*/
+
+
     return ['Laravel' => app()->version()];
 });
 
@@ -23,6 +30,7 @@ Route::resource('scrapping', NewsAndArticleController::class)
 ;
 
 Route::resource('personalize-profile', PersonalizeProfileController::class);
+Route::resource('news-source', NewsSourceController::class);
 
 
 require __DIR__.'/auth.php';

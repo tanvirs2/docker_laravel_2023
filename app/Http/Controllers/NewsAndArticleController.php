@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\NewsAndArticle;
 use App\Http\Requests\StoreNewsAndArticleRequest;
 use App\Http\Requests\UpdateNewsAndArticleRequest;
+use App\Models\NewsSource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
@@ -17,8 +18,6 @@ class NewsAndArticleController extends Controller
     {
 
         //$previousDay = Carbon::now()->subDay();
-
-
 
         $newsAndArticle = NewsAndArticle::limit(30)->latest()->get();
         return $newsAndArticle;
@@ -33,7 +32,35 @@ class NewsAndArticleController extends Controller
         $response = Http::get($endpoint);
         $json =  json_decode($response, true);
 
-        return $json;
+
+        $sourceArr = NewsSource::pluck('source_name')->toArray();
+
+        foreach ($json['articles'] as $item) {
+            $newsAndArticle = new NewsAndArticle();
+            $newsAndArticle->img                    = $item['urlToImage'];
+            $newsAndArticle->title                  = $item['title'];
+            $newsAndArticle->short_description      = $item['description'];
+            $newsAndArticle->description            = $item['content'];
+            $newsAndArticle->category               = 'not found';
+            $newsAndArticle->author                 = $item['author'];
+            $newsAndArticle->source                 = $item['source']['name'];
+            $newsAndArticle->publish_date           = $item['publishedAt'];
+
+            $sourceArr[] = $item['source']['name'];
+
+            //echo $item['title'] . '<br>';
+            //$newsAndArticle->save();
+        }
+
+        $sourceArr = array_unique($sourceArr);
+
+        foreach ($sourceArr as $source) {
+            $newsSource = new NewsSource();
+            $newsSource->source_name = $source;
+            $newsSource->save();
+        }
+
+        return $sourceArr;
     }
 
     /**

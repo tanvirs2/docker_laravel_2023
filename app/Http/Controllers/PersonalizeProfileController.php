@@ -30,6 +30,7 @@ class PersonalizeProfileController extends Controller
     public function store(StorePersonalizeProfileRequest $request)
     {
         $user_id = $request->user_id;
+        $selectedSourceArr = [];
 
         $personalizeProfile = new PersonalizeProfile();
 
@@ -38,18 +39,29 @@ class PersonalizeProfileController extends Controller
 
         if ($hasPersonalizeProfile != null) {
             //update Personalize Profile data
+            //array_merge($arr)
+            $selectedSourceArr = json_decode($hasPersonalizeProfile->sources);
+            if ($request->selectedSource) {
+                $selectedSourceArr[] = $request->selectedSource;
+            }
+            $hasPersonalizeProfile->sources = json_encode($selectedSourceArr);
             $hasPersonalizeProfile->status = $request->status;
             $hasPersonalizeProfile->save();
         } else {
             // Personalize Profile not found and new entry
+
             $personalizeProfile->user_id = $user_id;
+            if ($request->selectedSource) {
+                $selectedSourceArr[] = $request->selectedSource;
+            }
+            $personalizeProfile->sources = json_encode($selectedSourceArr);
             $personalizeProfile->status = $request->status;
             $personalizeProfile->save();
 
             $hasPersonalizeProfile = $personalizeProfile;
         }
 
-        return $hasPersonalizeProfile;
+        return [$hasPersonalizeProfile, json_decode($hasPersonalizeProfile->sources)];
     }
 
     /**
