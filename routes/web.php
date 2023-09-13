@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,12 +16,32 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    /*$selectedSourceArr = [];
-    $selectedSourceArr[] = 'tanvir';
-    $selectedSourceArr[] = 'nasir';
 
-    dump(json_decode(json_encode($selectedSourceArr)));*/
 
+    /*$data = '{
+          "action": "getArticles",
+          "keyword": "Barack Obama",
+          "articlesPage": 1,
+          "articlesCount": 100,
+          "articlesSortBy": "date",
+          "articlesSortByAsc": false,
+          "articlesArticleBodyLen": -1,
+          "resultType": "articles",
+          "dataType": [
+            "news",
+            "pr"
+          ],
+          "apiKey": "d18d09e9-d409-4452-b962-6e11d5966acd",
+          "forceMaxDataTimeWindow": 31
+        }';
+
+    $url = 'http://eventregistry.org/api/v1/article/getArticles';
+
+    //return json_decode($data);
+
+    $result = Http::withBody($data, 'application/json')->get($url);*/
+
+    //return json_decode($result);
 
     return ['Laravel' => app()->version()];
 });

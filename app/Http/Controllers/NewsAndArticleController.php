@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateNewsAndArticleRequest;
 use App\Models\NewsAuthor;
 use App\Models\NewsSource;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 class NewsAndArticleController extends Controller
@@ -24,14 +26,36 @@ class NewsAndArticleController extends Controller
     }
     /**
      * Display a listing of the resource.
+     * use Illuminate\Http\Request;
      */
-    public function index()
+    public function index(Request $request)
     {
+        $personalizeProfile = Auth::user()->personalizeProfile;
 
-        //$previousDay = Carbon::now()->subDay();
+        $query = NewsAndArticle::query();
 
-        $newsAndArticle = NewsAndArticle::limit(30)->latest()->get();
-        return $newsAndArticle;
+        if ($request['title'] != "null") {
+            $query = $query->where('title', 'LIKE', "%$request->title%");
+        }
+
+        if ($request->from != "null") {
+
+            if ($request->to != "null") {
+                $query = $query->whereBetween('publish_date',  [$request->from, $request->to]);
+            }
+        }
+
+        if ($personalizeProfile && $personalizeProfile->status == 'on') {
+            if ($request->filterType == 'source') {
+                $sources = json_decode($personalizeProfile->sources);
+                $query = $query->whereIn('source', $sources);
+            }else{
+                $authors = json_decode($personalizeProfile->authors);
+                $query = $query->whereIn('author', $authors);
+            }
+        }
+
+        return $query->latest()->get();
     }
 
     /**
@@ -54,15 +78,15 @@ class NewsAndArticleController extends Controller
             $newsAndArticle->short_description      = $item['description'];
             $newsAndArticle->description            = $item['content'];
             $newsAndArticle->category               = 'not found';
-            $newsAndArticle->author                 = $item['author'];
-            $newsAndArticle->source                 = $item['source']['name'];
+            $newsAndArticle->author                 = $this->removeSpecialChar($item['author']);
+            $newsAndArticle->source                 = $this->removeSpecialChar($item['source']['name']);
             $newsAndArticle->publish_date           = $item['publishedAt'];
 
             $sourceArr[] = $this->removeSpecialChar($item['source']['name']);
             $authorArr[] = $this->removeSpecialChar($item['author']);
 
             //echo $item['title'] . '<br>';
-            //$newsAndArticle->save();
+            $newsAndArticle->save();
         }
 
         $sourceArr = array_unique($sourceArr);
