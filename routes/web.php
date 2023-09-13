@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Interfaces\NewsAndArticleInterface;
+use App\NewsPortals\Portal_NewsApiOrg;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
@@ -15,8 +18,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+//App::bind(NewsAndArticleInterface::class, Portal_NewsApiOrg::class);
 
+Route::get('/', function () {
 
     /*$data = '{
           "action": "getArticles",
@@ -45,6 +49,15 @@ Route::get('/', function () {
 
     return ['Laravel' => app()->version()];
 });
+
+Route::get('fetch-news-save/{lowerModule}', function ($lowerModule){
+    $newsPortals = App::make('App\NewsPortals\\'.$lowerModule);
+    return $newsPortals->fetchNewsAndArticle();
+});
+
+Route::get('scrapping/save/{lowerModule}', [NewsAndArticleController::class, 'scrappingAndSave'])
+    //->middleware(['auth:sanctum'])
+;
 
 Route::resource('scrapping', NewsAndArticleController::class)
     //->middleware(['auth:sanctum'])

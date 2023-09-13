@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\NewsAndArticleInterface;
 use App\Models\NewsAndArticle;
 use App\Http\Requests\StoreNewsAndArticleRequest;
 use App\Http\Requests\UpdateNewsAndArticleRequest;
@@ -14,6 +15,14 @@ use Illuminate\Support\Facades\Http;
 
 class NewsAndArticleController extends Controller
 {
+    protected $newsAndArticleObj;
+
+    public function __construct()
+    {
+        //NewsAndArticleInterface $newsAndArticleDi
+        //$this->newsAndArticleObj = $newsAndArticleDi;
+    }
+
     function removeSpecialChar($str) {
 
         // Using str_replace() function
@@ -63,6 +72,56 @@ class NewsAndArticleController extends Controller
      */
     public function create()
     {
+        $endpoint = "https://newsapi.org/v2/everything?q=Apple&from=2023-09-11&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
+        $response = Http::get($endpoint);
+        $json =  json_decode($response, true);
+
+
+        $sourceArr = NewsSource::pluck('source_name')->toArray();
+        $authorArr = NewsAuthor::pluck('author_name')->toArray();
+
+        foreach ($json['articles'] as $item) {
+            $newsAndArticle = new NewsAndArticle();
+            $newsAndArticle->img                    = $item['urlToImage'];
+            $newsAndArticle->title                  = $item['title'];
+            $newsAndArticle->short_description      = $item['description'];
+            $newsAndArticle->description            = $item['content'];
+            $newsAndArticle->category               = 'not found';
+            $newsAndArticle->author                 = $this->removeSpecialChar($item['author']);
+            $newsAndArticle->source                 = $this->removeSpecialChar($item['source']['name']);
+            $newsAndArticle->publish_date           = $item['publishedAt'];
+
+            $sourceArr[] = $this->removeSpecialChar($item['source']['name']);
+            $authorArr[] = $this->removeSpecialChar($item['author']);
+
+            //echo $item['title'] . '<br>';
+            $newsAndArticle->save();
+        }
+
+        $sourceArr = array_unique($sourceArr);
+
+        foreach ($sourceArr as $source) {
+            $newsSource = new NewsSource();
+            $newsSource->source_name = $source;
+            $newsSource->save();
+        }
+
+        $authorArr = array_unique($authorArr);
+
+        //return ($authorArr);
+
+        foreach ($authorArr as $author) {
+            $newsAuthor = new NewsAuthor();
+            $newsAuthor->author_name = $author;
+            $newsAuthor->save();
+        }
+
+        return [$sourceArr, $authorArr];
+    }
+
+    public function scrappingAndSave()
+    {
+        //return '$newsAndArticleDi';
         $endpoint = "https://newsapi.org/v2/everything?q=Apple&from=2023-09-11&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
         $response = Http::get($endpoint);
         $json =  json_decode($response, true);
