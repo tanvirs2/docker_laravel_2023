@@ -53,8 +53,6 @@ class NewsAndArticleController extends Controller
             }
         }
 
-
-
         //return $query->latest()->get();
         //dd($query->latest()->get());
 
@@ -79,86 +77,13 @@ class NewsAndArticleController extends Controller
         //..
     }
 
-    public function scrappingAndSave()
-    {
-        //return '$newsAndArticleDi';
-        $endpoint = "https://newsapi.org/v2/everything?q=Apple&from=2023-09-11&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
-        $response = Http::get($endpoint);
-        $json =  json_decode($response, true);
-
-
-        $sourceArr = NewsSource::pluck('source_name')->toArray();
-        $authorArr = NewsAuthor::pluck('author_name')->toArray();
-
-        foreach ($json['articles'] as $item) {
-            $newsAndArticle = new NewsAndArticle();
-            $newsAndArticle->img                    = $item['urlToImage'];
-            $newsAndArticle->title                  = $item['title'];
-            $newsAndArticle->short_description      = $item['description'];
-            $newsAndArticle->description            = $item['content'];
-            $newsAndArticle->category               = 'not found';
-            $newsAndArticle->author                 = $this->removeSpecialChar($item['author']);
-            $newsAndArticle->source                 = $this->removeSpecialChar($item['source']['name']);
-            $newsAndArticle->publish_date           = $item['publishedAt'];
-
-            $sourceArr[] = $this->removeSpecialChar($item['source']['name']);
-            $authorArr[] = $this->removeSpecialChar($item['author']);
-
-            //echo $item['title'] . '<br>';
-            $newsAndArticle->save();
-        }
-
-        $sourceArr = array_unique($sourceArr);
-
-        foreach ($sourceArr as $source) {
-            $newsSource = new NewsSource();
-            $newsSource->source_name = $source;
-            $newsSource->save();
-        }
-
-        $authorArr = array_unique($authorArr);
-
-        //return ($authorArr);
-
-        foreach ($authorArr as $author) {
-            $newsAuthor = new NewsAuthor();
-            $newsAuthor->author_name = $author;
-            $newsAuthor->save();
-        }
-
-        return [$sourceArr, $authorArr];
-    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreNewsAndArticleRequest $request)
     {
-        $endpoint = "https://newsapi.org/v2/everything?q=Apple&from=2023-09-10&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
-        $response = Http::get($endpoint);
-        $json =  json_decode($response, true);
 
-        //return $json;
-
-        /*$client = new \GuzzleHttp\Client();
-        $res = $client->get($endpoint);
-        $content = $res->getBody();
-        $json = json_decode($content, true);*/
-
-        foreach ($json['articles'] as $item) {
-            $newsAndArticle = new NewsAndArticle();
-            $newsAndArticle->img                    = $item['urlToImage'];
-            $newsAndArticle->title                  = $item['title'];
-            $newsAndArticle->short_description      = $item['description'];
-            $newsAndArticle->description            = $item['content'];
-            $newsAndArticle->category               = 'not found';
-            $newsAndArticle->author                 = $item['author'];
-            $newsAndArticle->source                 = $item['source']['name'];
-            $newsAndArticle->publish_date           = $item['publishedAt'];
-
-            //echo $item['title'] . '<br>';
-            //$newsAndArticle->save();
-        }
     }
 
     /**
