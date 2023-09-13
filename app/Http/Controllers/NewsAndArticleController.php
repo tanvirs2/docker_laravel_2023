@@ -35,17 +35,25 @@ class NewsAndArticleController extends Controller
         $request['title'] = $this->ifNullAssign($request['title']);
         $request['from'] = $this->ifNullAssign($request['from']);
         $request['to'] = $this->ifNullAssign($request['to']);
+        $request['btnClicked'] = $this->ifNullAssign($request['btnClicked']);
+
+        //return $request['btnClicked'];
+
+        if (!$request['btnClicked']) {
+            $query = $query->limit(50);
+        }
 
         if ($request['title']) {
             $query = $query->where('title', 'LIKE', "%$request->title%");
         }
 
         if ($request->from) {
-
             if ($request->to) {
                 $query = $query->whereBetween('publish_date',  [$request->from, $request->to]);
             }
         }
+
+
 
         //return $query->latest()->get();
         //dd($query->latest()->get());
