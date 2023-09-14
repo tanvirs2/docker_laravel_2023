@@ -50,6 +50,7 @@ class Portal_NewsApiOrg implements NewsAndArticleInterface
         $previousDay = date('Y-m-') . date('d') - 1;
 
         $endpoint = "https://newsapi.org/v2/everything?q=Apple&from=$previousDay&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
+        $endpoint = "https://newsapi.org/v2/everything?q=Apple&sortBy=popularity&apiKey=572294b3723746ebbbe9ba2ce111f8bb";
         //dd($endpoint);
         $response = Http::get($endpoint);
         $json =  json_decode($response, true);

@@ -15,7 +15,7 @@ class NewsAndArticleProcessor
 
     public function saveToDB()
     {
-        $this->newsAndArticleObject->saveToDB();
+        return $this->newsAndArticleObject->fetchNewsAndArticle();
     }
 
 }
