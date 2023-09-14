@@ -35,6 +35,8 @@ class NewsAndArticleController extends Controller
         $request['title'] = $this->ifNullAssign($request['title']);
         $request['from'] = $this->ifNullAssign($request['from']);
         $request['to'] = $this->ifNullAssign($request['to']);
+        $request['source'] = $this->ifNullAssign($request['source']);
+        $request['author'] = $this->ifNullAssign($request['author']);
         $request['btnClicked'] = $this->ifNullAssign($request['btnClicked']);
 
         //return $request['btnClicked'];
@@ -45,6 +47,14 @@ class NewsAndArticleController extends Controller
 
         if ($request['title']) {
             $query = $query->where('title', 'LIKE', "%$request->title%");
+        }
+
+        if ($request['source']) {
+            $query = $query->where('source', $request['source']);
+        }
+
+        if ($request['author']) {
+            $query = $query->where('author', $request['author']);
         }
 
         if ($request->from) {
