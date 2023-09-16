@@ -1,62 +1,44 @@
-########################################################################
-### Composer
-
-FROM composer:1.10 AS composer
-
-COPY composer.json /app
-COPY composer.lock /app
-
-RUN composer install        \
-    --ignore-platform-reqs  \
-    --no-ansi               \
-    --no-autoloader         \
-    --no-interaction        \
-    --no-scripts
-
-COPY . /app/
-RUN composer dump-autoload --optimize --classmap-authoritative
-
-### Composer
-########################################################################
-### NodeJS
-
-FROM node:14.17.0-alpine3.12 AS node
-
-WORKDIR /app
-
-COPY package.json           /app
-COPY /resources             /app/resources
-
-RUN npm install && npm run dev
-
-### NodeJS
-########################################################################
-### PHP
-
-FROM php:7.4-fpm-alpine3.12
-
-RUN apk update && apk add --no-cache \
-    libpng-dev                       \
-    freetype-dev                     \
-    oniguruma-dev                    \
-    libxml2-dev
-
-RUN rm -rf /var/lib/apt/lists/* && rm -rf /var/cache/apk/*
-RUN docker-php-ext-configure gd --enable-gd --with-freetype
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
-COPY . /var/www
-COPY --from=composer /app/vendor                /var/www/html/vendor
-COPY --from=node     /app/public                /var/www/html/public/
-COPY --from=node     /app/mix-manifest.json     /var/www/html/mix-manifest.json
+FROM php:8.2-fpm
 
 
-RUN addgroup -g 1000 -S www && \
-    adduser -u 1000 -S www -G www-data
+# Mod Rewrite
+RUN a2enmod rewrite
 
-COPY --chown=www:www-data . /var/www
+# Linux Library
+RUN apt-get update -y && apt-get install -y \
+    libicu-dev \
+    libmariadb-dev \
+    unzip zip \
+    zlib1g-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev
 
-WORKDIR /var/www
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-### PHP
-########################################################################
+
+# PHP Extension
+RUN docker-php-ext-install gettext intl pdo_mysql gd
+
+RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
+
+
+# Install Laravel dependencies
+WORKDIR /var/www/html
+
+# Copy the Laravel application to the container
+COPY . /var/www/html
+
+RUN composer install --no-dev
+
+# Expose the Laravel port
+EXPOSE 8000
+
+CMD php artisan serve --host=0.0.0.0 --port=8000
+
+# Run the Laravel application
+#CMD ["php", "artisan", "serve"]

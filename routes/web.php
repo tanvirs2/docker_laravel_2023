@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 use App\Interfaces\NewsAndArticleInterface;
 use App\NewsPortals\Portal_NewsApiOrg;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+//use mysql_xdevapi\Exception;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +21,24 @@ use Illuminate\Support\Facades\Route;
 */
 
 //App::bind(NewsAndArticleInterface::class, Portal_NewsApiOrg::class);
+
+Route::get('/install', function () {
+
+    Artisan::call('migrate:fresh');
+
+    Artisan::call('db:seed');
+
+    return 'done!';
+
+});
+
+Route::get('/fresh-install', function () {
+
+    Artisan::call('app:fresh-install');
+
+    return 'fresh-install done!';
+
+});
 
 Route::get('/', function () {
     return ['Laravel' => app()->version()];
