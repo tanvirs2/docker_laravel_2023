@@ -23,13 +23,13 @@ class FetchNewsAndArticle extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'fetch-news-and-article-for-today';
 
     public static function newsAndArticleSaveToDB()
     {
-        (new NewsAndArticleProcessor(new Portal_NewsApiOrg))->saveToDB();
-        (new NewsAndArticleProcessor(new Portal_NewYorkTimes))->saveToDB();
         (new NewsAndArticleProcessor(new Portal_TheGuardian))->saveToDB();
+        (new NewsAndArticleProcessor(new Portal_NewYorkTimes))->saveToDB();
+        (new NewsAndArticleProcessor(new Portal_NewsApiOrg))->saveToDB();
     }
 
     /**
@@ -37,8 +37,6 @@ class FetchNewsAndArticle extends Command
      */
     public function handle()
     {
-        //Artisan::call('migrate:fresh');
-        //Artisan::call('db:seed');
         $this->newsAndArticleSaveToDB();
     }
 }

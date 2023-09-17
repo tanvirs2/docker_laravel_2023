@@ -25,7 +25,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/install', function () {
 
     Artisan::call('migrate:fresh');
-
     Artisan::call('db:seed');
 
     return 'done!';
@@ -34,7 +33,15 @@ Route::get('/install', function () {
 
 Route::get('/fresh-install', function () {
 
-    Artisan::call('app:fresh-install');
+    $execute = Artisan::call('app:fresh-install');
+
+    return 'fresh-install done!';
+
+});
+
+Route::get('/fetch-for-today', function () {
+
+    $execute = Artisan::call('app:fetch-news-and-article');
 
     return 'fresh-install done!';
 

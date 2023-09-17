@@ -2,7 +2,7 @@ FROM php:8.2-fpm
 
 
 # Mod Rewrite
-RUN a2enmod rewrite
+# RUN a2enmod rewrite
 
 # Linux Library
 RUN apt-get update -y && apt-get install -y \

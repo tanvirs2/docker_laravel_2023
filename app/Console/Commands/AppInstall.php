@@ -23,14 +23,17 @@ class AppInstall extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Fresh migrate, DB seed, Fetch Articles';
 
     public function newsAndArticleSaveToDB()
     {
+
         $this->info('Install start...');
-        $this->line('"NewsApi.Org" fetching start...');
-        (new NewsAndArticleProcessor(new Portal_NewsApiOrg))->saveToDB(); // fetch news and articles from: "NewsApi.Org"
-        $this->info('Done! "NewsApi.Org" Save successful!');
+        $this->line('');
+        $this->line('"The Guardian" fetching start...');
+        (new NewsAndArticleProcessor(new Portal_TheGuardian))->saveToDB(); // fetch news and articles from: "The Guardian"
+        $this->info('Done! "The Guardian" Save successful!');
+
 
         $this->line('');
         $this->line('"New YorkTimes" fetching start...');
@@ -38,10 +41,10 @@ class AppInstall extends Command
         $this->info('Done! "New YorkTimes" Save successful!');
 
 
-        $this->line('');
-        $this->line('"The Guardian" fetching start...');
-        (new NewsAndArticleProcessor(new Portal_TheGuardian))->saveToDB(); // fetch news and articles from: "The Guardian"
-        $this->info('Done! "The Guardian" Save successful!');
+        $this->line('"NewsApi.Org" fetching start...');
+        (new NewsAndArticleProcessor(new Portal_NewsApiOrg))->saveToDB(); // fetch news and articles from: "NewsApi.Org"
+        $this->info('Done! "NewsApi.Org" Save successful!');
+
 
     }
 
